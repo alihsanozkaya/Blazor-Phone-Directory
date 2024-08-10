@@ -1,0 +1,200 @@
+﻿@page "/profile"
+@using Models.User
+@using Services.User
+@inject NavigationManager Navigation
+@inject UpdateService UpdateService
+@inject AuthService AuthService
+@inject IJSRuntime JSRuntime
+@inject UserService UserService
+
+<PageTitle>Profil</PageTitle>
+
+@if (user == null)
+{
+    <p>Yükleniyor...</p>
+}
+else
+{
+    <div class="container mt-5">
+        <div class="form-container p-4 rounded shadow-sm" style="background-color: #DCD0FF">
+            <h2 class="text-center mb-4">Profil Bilgileri</h2>
+            <div class="mb-2">
+                <h4 class="text-wrap"><strong>Kullanıcı adı:</strong> @user.Username</h4>
+            </div>
+
+            <div class="mb-2">
+                <h4 class="text-wrap"><strong>Ad:</strong> @user.FirstName</h4>
+            </div>
+
+            <div class="mb-2">
+                <h4 class="text-wrap"><strong>Soyad:</strong> @user.LastName</h4>
+            </div>
+
+            <div class="d-flex justify-content-center mt-4">
+                <button class="btn text-white" style="background-color: #3A0647" @onclick="() => OpenUpdateModal(user)">Profili Güncelle</button>
+            </div>
+
+            @if (isUpdateModalOpen)
+            {
+                <div class="modal d-block">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Profil Güncelle</h5>
+                                <button type="button" class="btn-close" @onclick="CloseUpdateModal"></button>
+                            </div>
+                            <div class="modal-body">
+                                @if (!string.IsNullOrEmpty(errorMessage))
+                                {
+                                    <div class="alert alert-danger mt-3">
+                                        @errorMessage
+                                    </div>
+                                }
+                                <EditForm Model="selectedUser" OnValidSubmit="HandleValidSubmit">
+                                    <DataAnnotationsValidator />
+                                    <div class="mb-2">
+                                        <label for="username" class="form-label">Kullanıcı adı <strong class="text-danger">*</strong></label>
+                                        <InputText id="username" class="form-control" @bind-Value="selectedUser.Username" />
+                                        <ValidationMessage For="() => selectedUser.Username" />
+                                    </div>
+
+                                    <div class="mb-2">
+                                        <label for="firstname" class="form-label">Ad <strong class="text-danger">*</strong></label>
+                                        <InputText id="firstname" class="form-control" @bind-Value="selectedUser.FirstName" />
+                                        <ValidationMessage For="() => selectedUser.FirstName" />
+                                    </div>
+
+                                    <div class="mb-2">
+                                        <label for="lastname" class="form-label">Soyad <strong class="text-danger">*</strong></label>
+                                        <InputText id="lastname" class="form-control" @bind-Value="selectedUser.LastName" />
+                                        <ValidationMessage For="() => selectedUser.LastName" />
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="submit" class="btn btn-success">Kaydet</button>
+                                        <button type="button" class="btn btn-secondary" @onclick="CloseUpdateModal">İptal</button>
+                                    </div>
+                                </EditForm>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-backdrop fade show"></div>
+            }
+        </div>
+    </div>
+}
+
+<style>
+    .text-wrap {
+        word-wrap: break-word !important;
+        overflow-wrap: break-word !important;
+    }
+</style>
+
+@code {
+    private UserModel? user;
+    private UserModel? selectedUser;
+    private bool isUpdateModalOpen = false;
+    private string? errorMessage;
+    private UserModel? originalUser;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!await AuthService.IsAuthenticatedAsync())
+        {
+            Navigation.NavigateTo("/login", true);
+            return;
+        }
+
+        await LoadUserAsync();
+    }
+
+    private async Task LoadUserAsync()
+    {
+        try
+        {
+            var userId = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "userId");
+            if (!string.IsNullOrEmpty(userId))
+            {
+                user = await UserService.GetUserAsync(int.Parse(userId));
+                if (user != null)
+                {
+                    originalUser = new UserModel
+                        {
+                            Id = user.Id,
+                            Username = user.Username,
+                            FirstName = user.FirstName,
+                            LastName = user.LastName
+                        };
+                }
+            }
+            else
+            {
+                Console.WriteLine("Kullanıcı ID'si bulunamadı.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Veri yüklenirken hata oluştu: {ex.Message}");
+        }
+    }
+
+    private void OpenUpdateModal(UserModel user)
+    {
+        selectedUser = new UserModel
+            {
+                Id = user.Id,
+                Username = user.Username,
+                FirstName = user.FirstName,
+                LastName = user.LastName
+            };
+        isUpdateModalOpen = true;
+        errorMessage = null;
+    }
+
+    private void CloseUpdateModal()
+    {
+        isUpdateModalOpen = false;
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            if (selectedUser != null && !IsUserChanged(selectedUser, originalUser))
+            {
+                errorMessage = "Güncellenmiş bir bilgi yok.";
+                return;
+            }
+
+            var result = await UserService.UpdateUserAsync(new UpdateUserModel
+                {
+                    Id = selectedUser.Id,
+                    Username = selectedUser.Username,
+                    FirstName = selectedUser.FirstName,
+                    LastName = selectedUser.LastName
+                });
+
+            if (result.Success)
+            {
+                isUpdateModalOpen = false;
+                await LoadUserAsync();
+            }
+            else
+            {
+                errorMessage = result.Message;
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Güncelleme sırasında hata oluştu: {ex.Message}";
+        }
+    }
+
+    private bool IsUserChanged(UserModel updatedUser, UserModel originalUser)
+    {
+        return updatedUser.Username != originalUser.Username ||
+               updatedUser.FirstName != originalUser.FirstName ||
+               updatedUser.LastName != originalUser.LastName;
+    }
+}

@@ -1,0 +1,83 @@
+﻿@page "/directory/newDirectory"
+@using Models.Directory
+@inject DirectoryService DirectoryService
+@inject AuthService AuthService
+@inject IJSRuntime JSRuntime
+@inject NavigationManager Navigation
+
+<div class="container">
+    <div class="form-container">
+        <h2 class="text-center mt-2">Rehbere kayıt ekle</h2>
+        <EditForm Model="newDirectory" OnValidSubmit="HandleValidSubmit">
+            <DataAnnotationsValidator />
+
+            <div class="mb-2">
+                <label for="firstName">Ad <strong class="text-danger">*</strong></label>
+                <InputText class="custom-input" id="firstName" @bind-Value="newDirectory.FirstName" />
+                <ValidationMessage For="() => newDirectory.FirstName" />
+            </div>
+
+            <div class="mb-2">
+                <label for="lastName">Soyad</label>
+                <InputText class="custom-input" id="lastName" @bind-Value="newDirectory.LastName" />
+            </div>
+
+            <div class="mb-2">
+                <label for="phoneNumber">Telefon <strong class="text-danger">*</strong></label>
+                <InputText class="custom-input" id="phoneNumber" @bind-Value="newDirectory.PhoneNumber" />
+                <ValidationMessage For="() => newDirectory.PhoneNumber" />
+            </div>
+
+            <div class="mb-3">
+                <label for="address">Adres</label>
+                <InputTextArea class="custom-input" id="address" @bind-Value="newDirectory.Address" />
+            </div>
+
+            <div class="d-flex justify-content-around mt-3">
+                <button class="btn btn-success w-25" type="submit">Kaydet</button>
+                <button class="btn btn-secondary w-25" type="button" @onclick="Cancel">İptal</button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private AddDirectoryModel newDirectory = new AddDirectoryModel();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!await AuthService.IsAuthenticatedAsync())
+        {
+            Navigation.NavigateTo("/login", true);
+            return;
+        }
+
+        var userId = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "userId");
+        if (!string.IsNullOrEmpty(userId))
+        {
+            newDirectory.UserId = int.Parse(userId);
+        }
+        else
+        {
+            Console.WriteLine("UserId bulunamadı.");
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            await DirectoryService.AddDirectoryAsync(newDirectory);
+            Navigation.NavigateTo("/directory");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Kayıt eklenirken hata oluştu: {ex.Message}");
+        }
+    }
+
+    private void Cancel()
+    {
+        Navigation.NavigateTo("/directory");
+    }
+}

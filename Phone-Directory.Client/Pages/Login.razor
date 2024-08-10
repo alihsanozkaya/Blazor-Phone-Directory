@@ -1,0 +1,71 @@
+﻿@page "/login"
+@using Models.Auth
+@inject LoginService LoginService
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+@inject AuthService AuthService
+
+<div class="container">
+    <div class="form-container">
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="alert alert-danger mt-2" role="alert">
+                @errorMessage
+            </div>
+        }
+        <h2 class="text-center mt-2">Giriş yap</h2>
+        <EditForm Model="loginModel" OnValidSubmit="HandleValidSubmit">
+            <DataAnnotationsValidator />
+
+            <div class="mb-2">
+                <label for="username" class="form-label">Kullanıcı adı <strong class="text-danger">*</strong></label>
+                <InputText id="username" class="custom-input" @bind-Value="loginModel.Username" />
+                <ValidationMessage For="() => loginModel.Username" />
+            </div>
+
+            <div class="mb-3">
+                <label for="password" class="form-label">Şifre <strong class="text-danger">*</strong></label>
+                <InputText id="password" type="password" class="custom-input" @bind-Value="loginModel.Password" />
+                <ValidationMessage For="() => loginModel.Password" />
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Giriş yap</button>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private LoginModel loginModel = new LoginModel();
+    private string errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (await AuthService.IsAuthenticatedAsync())
+        {
+            Navigation.NavigateTo("/directory", true);
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            var (error, result) = await LoginService.LoginUserAsync(loginModel);
+
+            if (error != null)
+            {
+                errorMessage = error;
+            }
+            else
+            {
+                await JS.InvokeVoidAsync("localStorage.setItem", "token", result.Token);
+                await JS.InvokeVoidAsync("localStorage.setItem", "userId", result.UserId.ToString());
+                Navigation.NavigateTo("/directory", true);
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Giriş yapılırken bir hata oluştu: {ex.Message}";
+        }
+    }
+}

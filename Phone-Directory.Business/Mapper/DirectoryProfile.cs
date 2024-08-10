@@ -13,13 +13,8 @@ namespace Phone_Directory.Business.Mapper
     {
         public DirectoryProfile()
         {
-            CreateMap<DirectoryDto, Entities.Models.Directory>();
             CreateMap<DirectoryDto, Entities.Models.Directory>().ReverseMap();
-
-            CreateMap<AddDirectoryDto, Entities.Models.Directory>();
             CreateMap<AddDirectoryDto, Entities.Models.Directory>().ReverseMap();
-
-            CreateMap<UpdateDirectoryDto, Entities.Models.Directory>();
             CreateMap<UpdateDirectoryDto, Entities.Models.Directory>().ReverseMap();
         }
     }

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Phone_Directory.Business.Abstract;
 using Phone_Directory.DataAccess.Abstract;
+using Phone_Directory.Entities.DTOS.Auth;
 using Phone_Directory.Entities.DTOS.User;
 using Phone_Directory.Entities.Models;
 using System;
@@ -16,35 +17,37 @@ using System.Threading.Tasks;
 
 namespace Phone_Directory.Business.Concrete
 {
-    public class AuthService : IAuthService
+    public class AuthManager : IAuthService
     {
         private readonly IUserRepository _userRepository;
         private readonly IConfiguration _configuration;
+        private readonly IMapper _mapper;
 
-        public AuthService(IUserRepository userRepository, IConfiguration configuration)
+        public AuthManager(IUserRepository userRepository, IConfiguration configuration, IMapper mapper)
         {
             _userRepository = userRepository;
             _configuration = configuration;
+            _mapper = mapper;
         }
 
-        public async Task<User> Register(RegisterDto registerDto)
+        public async Task<(UserDto UserDto, bool Success, string Message)> Register(RegisterDto registerDto)
         {
-            if (await _userRepository.GetUserByUsernameAsync(registerDto.Username) != null)
-                throw new Exception("Bu kullanıcı adı zaten kullanılmakta.");
+            var existingUser = await _userRepository.GetUserByUsernameAsync(registerDto.Username);
+            if (existingUser != null)
+            {
+                return (null, false, "Bu kullanıcı adı sitemde mevcut.");
+            }
 
             CreatePasswordHash(registerDto.Password, out byte[] passwordHash, out byte[] passwordSalt);
 
-            var user = new User
-            {
-                Username = registerDto.Username,
-                PasswordHash = passwordHash,
-                PasswordSalt = passwordSalt,
-                FirstName = registerDto.FirstName,
-                LastName = registerDto.LastName
-            };
+            var user = _mapper.Map<User>(registerDto);
+            user.PasswordHash = passwordHash;
+            user.PasswordSalt = passwordSalt;
 
             await _userRepository.CreateUserAsync(user);
-            return user;
+
+            var userDto = _mapper.Map<UserDto>(user);
+            return (userDto, true, "Kullanıcı başarıyla üye oldu.");
         }
 
         public async Task<UserDto> Authenticate(LoginDto loginDto)
@@ -54,14 +57,7 @@ namespace Phone_Directory.Business.Concrete
             if (user == null || !VerifyPassword(loginDto.Password, user.PasswordHash, user.PasswordSalt))
                 return null;
 
-            return new UserDto
-            {
-                Id = user.Id,
-                Username = user.Username,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                CreatedAt = user.CreatedAt
-            };
+            return _mapper.Map<UserDto>(user);
         }
 
         public string GenerateJwtToken(User user)
@@ -75,7 +71,7 @@ namespace Phone_Directory.Business.Concrete
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.Username)
             }),
-                Expires = DateTime.UtcNow.AddHours(1),
+                Expires = DateTime.UtcNow.AddYears(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);

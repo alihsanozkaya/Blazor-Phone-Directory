@@ -3,15 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34701.34
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Phone-Directory.Server", "Phone-Directory.Server\Phone-Directory.Server.csproj", "{2A7CB8F4-B847-49AF-BC1A-5757418D11BD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Phone-Directory.Server", "Phone-Directory.Server\Phone-Directory.Server.csproj", "{2A7CB8F4-B847-49AF-BC1A-5757418D11BD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Phone-Directory.Client", "Phone-Directory.Client\Phone-Directory.Client.csproj", "{2785B36E-D50D-48B7-A95C-C5FDFD6549F1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Phone-Directory.Client", "Phone-Directory.Client\Phone-Directory.Client.csproj", "{2785B36E-D50D-48B7-A95C-C5FDFD6549F1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Phone-Directory.Business", "Phone-Directory.Business\Phone-Directory.Business.csproj", "{CB139CAE-69D9-4B49-B1E4-D6F083F1E140}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Phone-Directory.Business", "Phone-Directory.Business\Phone-Directory.Business.csproj", "{CB139CAE-69D9-4B49-B1E4-D6F083F1E140}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Phone-Directory.Entities", "Phone-Directory.Entities\Phone-Directory.Entities.csproj", "{B4284806-16E6-4D41-9EB4-F5CC039A5FCE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Phone-Directory.Entities", "Phone-Directory.Entities\Phone-Directory.Entities.csproj", "{B4284806-16E6-4D41-9EB4-F5CC039A5FCE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Phone-Directory.DataAccess", "Phone-Directory.DataAccess\Phone-Directory.DataAccess.csproj", "{374BEB2E-69DF-4980-A4B0-8A10881E27D4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Phone-Directory.DataAccess", "Phone-Directory.DataAccess\Phone-Directory.DataAccess.csproj", "{374BEB2E-69DF-4980-A4B0-8A10881E27D4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

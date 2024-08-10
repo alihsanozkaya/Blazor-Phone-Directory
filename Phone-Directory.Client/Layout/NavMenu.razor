@@ -1,6 +1,10 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@inject IJSRuntime JSRuntime
+
+<div class="top-row ps-5 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">Phone-Directory.Client</a>
+        <a class="navbar-brand" href="/">
+            <img src="/telephone-directory.png" alt="Logo" style="height: 50px;" />
+        </a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -11,23 +15,50 @@
     <nav class="flex-column">
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Anasayfa
             </NavLink>
         </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
-            </NavLink>
-        </div>
+        @if (isLoggedIn)
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="directory" Match="NavLinkMatch.All">
+                    <span class="bi bi-person-rolodex-nav-menu" aria-hidden="true"></span> Rehber
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="directory/newDirectory" Match="NavLinkMatch.All">
+                    <span class="bi bi-person-fill-add-nav-menu" aria-hidden="true"></span> Rehber Kayıt
+                </NavLink>
+            </div>
+        }
     </nav>
 </div>
 
 @code {
+
+    private bool isLoggedIn = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var token = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "token");
+
+            if (!string.IsNullOrEmpty(token))
+            {
+                isLoggedIn = true;
+            }
+            else
+            {
+                isLoggedIn = false;
+            }
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"JavaScript çağrısı sırasında hata oluştu: {ex.Message}");
+        }
+    }
     private bool collapseNavMenu = true;
 
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;

@@ -1,7 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Phone_Directory.Business.Abstract;
-using Phone_Directory.Entities.DTOS.User;
+using Phone_Directory.Entities.DTOS.Auth;
 using Phone_Directory.Entities.Models;
 
 namespace Phone_Directory.Server.Controllers
@@ -11,7 +10,6 @@ namespace Phone_Directory.Server.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
-
         public AuthController(IAuthService authService)
         {
             _authService = authService;
@@ -21,16 +19,18 @@ namespace Phone_Directory.Server.Controllers
         public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
         {
             if (!ModelState.IsValid)
+            {
                 return BadRequest(ModelState);
-
-            try
-            {
-                var userDto = await _authService.Register(registerDto);
-                return Ok(userDto);
             }
-            catch (Exception ex)
+            var (userDto, success, message) = await _authService.Register(registerDto);
+
+            if (success)
             {
-                return BadRequest(new { message = ex.Message });
+                return Ok(new { Data = userDto, message });
+            }
+            else
+            {
+                return BadRequest(new { message });
             }
         }
 
@@ -38,8 +38,10 @@ namespace Phone_Directory.Server.Controllers
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
             if (!ModelState.IsValid)
+            {
                 return BadRequest(ModelState);
 
+            }
             var userDto = await _authService.Authenticate(loginDto);
             if (userDto == null)
                 return Unauthorized(new { message = "Geçersiz kullanıcı adı veya şifre" });
@@ -50,7 +52,8 @@ namespace Phone_Directory.Server.Controllers
                 Username = userDto.Username
             });
 
-            return Ok(new { token });
+            return Ok(new { token, userId = userDto.Id, message = "Giriş yapıldı" });
         }
+
     }
 }

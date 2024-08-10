@@ -1,16 +1,62 @@
 ﻿@inherits LayoutComponentBase
+@inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+
 <div class="page">
     <div class="sidebar">
         <NavMenu />
     </div>
-
     <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+        <div class="top-row px-4" style="background-color: #3A0647">
+            @if (isLoggedIn)
+            {
+                <NavLink class="btn" style="text-decoration: none; background-color: #f0f4f6" href="profile">Profil</NavLink>
+                <button class="btn bg-white ms-4" style="background-color: #f0f4f6" @onclick="Logout">Çıkış yap</button>
+            }
+            else
+            {
+                <NavLink class="btn bg-white" style="text-decoration: none; background-color: #f0f4f6" href="login">Giriş yap</NavLink>
+                <NavLink class="btn bg-white" href="register" style="text-decoration: none; background-color: #f0f4f6">Kayıt ol</NavLink>
+            }
         </div>
-
         <article class="content px-4">
             @Body
         </article>
     </main>
 </div>
+
+@code {
+    private bool isLoggedIn = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var token = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "token");
+
+            if (!string.IsNullOrEmpty(token))
+            {
+                isLoggedIn = true;
+            }
+            else
+            {
+                isLoggedIn = false;
+            }
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"JavaScript çağrısı sırasında hata oluştu: {ex.Message}");
+        }
+    }
+
+    private async Task Logout()
+    {
+        await JSRuntime.InvokeVoidAsync("localStorage.removeItem", "token");
+        await JSRuntime.InvokeVoidAsync("localStorage.removeItem", "userId");
+
+        isLoggedIn = false;
+        StateHasChanged();
+        Navigation.NavigateTo("/login", true);
+    }
+}

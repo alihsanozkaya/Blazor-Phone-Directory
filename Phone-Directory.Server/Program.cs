@@ -11,10 +11,11 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddTransient<IAuthService, AuthService>();
+builder.Services.AddTransient<IAuthService, AuthManager>();
+builder.Services.AddTransient<IUserService, UserManager>();
 builder.Services.AddTransient<IUserRepository>(provider => new UserRepository(connectionString));
 
-builder.Services.AddTransient<IDirectoryService, DirectoryService>();
+builder.Services.AddTransient<IDirectoryService, DirectoryManager>();
 builder.Services.AddTransient<IDirectoryRepository>(provider => new DirectoryRepository(connectionString));
 
 // Add services to the container.
@@ -24,6 +25,16 @@ builder.Services.AddRazorPages();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddDistributedMemoryCache(); // Session için gereken cache.
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // Session süresi.
+    options.Cookie.HttpOnly = true; // Session çerezlerini güvenli yapar.
+    options.Cookie.IsEssential = true;
+});
+
+builder.Services.AddControllersWithViews();
 
 var mapperConfig = new MapperConfiguration(mc =>
 {
@@ -51,6 +62,18 @@ builder.Services.AddAuthentication(options =>
 var mapper = mapperConfig.CreateMapper();
 builder.Services.AddSingleton(mapper);
 
+builder.Services.AddHttpClient();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("BlazorPolicy", builder =>
+    {
+        builder.WithOrigins("https://localhost:5001")
+               .AllowAnyMethod()
+               .AllowAnyHeader();
+    });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -64,9 +87,18 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
+app.UseRouting();
+app.UseSession();
 app.UseAuthentication();
-app.UseAuthorization(); 
+app.UseAuthorization();
+app.UseCors("BlazorPolicy");
 app.MapRazorPages();
 app.MapControllers();
 app.MapFallbackToFile("index.html");
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllerRoute(
+        name: "default",
+        pattern: "{controller=Home}/{action=Index}/{id?}");
+});
 app.Run();

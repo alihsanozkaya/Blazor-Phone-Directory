@@ -1,0 +1,79 @@
+﻿@page "/register"
+@using Models.Auth
+@inject NavigationManager Navigation
+@inject AuthService AuthService
+@inject RegisterService RegisterService
+@inject IJSRuntime JS
+
+<div class="container">
+    <div class="form-container">
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="alert alert-danger mb-2" role="alert">
+                @errorMessage
+            </div>
+        }
+        <h2 class="text-center mt-2">Üye ol</h2>
+        <EditForm Model="registerModel" OnValidSubmit="HandleValidSubmit">
+            <DataAnnotationsValidator />
+            <div class="mb-2">
+                <label for="username" class="form-label">Kullanıcı adı <strong class="text-danger">*</strong></label>
+                <InputText id="username" class="custom-input" @bind-Value="registerModel.Username" />
+                <ValidationMessage For="() => registerModel.Username" />
+            </div>
+
+            <div class="mb-2">
+                <label for="firstname" class="form-label">Ad <strong class="text-danger">*</strong></label>
+                <InputText id="firstname" class="custom-input" @bind-Value="registerModel.FirstName" />
+                <ValidationMessage For="() => registerModel.FirstName" />
+            </div>
+
+            <div class="mb-2">
+                <label for="lastname" class="form-label">Soyad <strong class="text-danger">*</strong></label>
+                <InputText id="lastname" class="custom-input" @bind-Value="registerModel.LastName" />
+                <ValidationMessage For="() => registerModel.LastName" />
+            </div>
+
+            <div class="mb-2">
+                <label for="password" class="form-label">Şifre <strong class="text-danger">*</strong></label>
+                <InputText id="password" type="password" class="custom-input" @bind-Value="registerModel.Password" />
+                <ValidationMessage For="() => registerModel.Password" />
+            </div>
+
+            <div class="mb-3">
+                <label for="confirmPassword" class="form-label">Şifre Tekrarı <strong class="text-danger">*</strong></label>
+                <InputText id="confirmPassword" type="password" class="custom-input" @bind-Value="registerModel.ConfirmPassword" />
+                <ValidationMessage For="() => registerModel.ConfirmPassword" />
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Üye ol</button>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private RegisterModel registerModel = new RegisterModel();
+    private string? errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var isAuthenticated = await AuthService.IsAuthenticatedAsync();
+        if (isAuthenticated)
+        {
+            Navigation.NavigateTo("/directory", true);
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        var result = await RegisterService.RegisterUserAsync(registerModel);
+        if (result == null)
+        {
+            Navigation.NavigateTo("/login");
+        }
+        else
+        {
+            errorMessage = result;
+        }
+    }
+}

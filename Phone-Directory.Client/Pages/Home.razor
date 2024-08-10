@@ -1,7 +1,74 @@
 ﻿@page "/"
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Anasayfa</PageTitle>
 
-<h1>Hello, world!</h1>
 
-Welcome to your new app.
+<div class="text-center mb-4">
+    <h1>Proje Özeti</h1>
+    <p>Bu sayfada projenizde gerçekleştirdiğiniz ana işlevler ve özellikler özetlenmiştir.</p>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Kullanıcı Kaydı</h5>
+                <p class="card-text">
+                    Kullanıcılar uygulamaya üye olabilmekte ve kişisel bilgilerini kaydedebilmektedir.
+                    Kayıt sırasında kullanıcı adı, ad, soyad, şifre ve şifre tekrarını içeren bilgiler istenmektedir.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Kullanıcı Girişi</h5>
+                <p class="card-text">
+                    Giriş yaparak kullanıcı adı ve şifrenizi doğrulayabilir,
+                    başarılı girişlerde sistem tarafından size bir JWT token verilir ve bu token ile API isteklerinde bulunabilirsiniz.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Rehber Yönetimi</h5>
+                <p class="card-text">
+                    Kullanıcılar rehberdeki kişileri görüntüleyebilir, yeni kişiler ekleyebilir ve mevcut kişilerin bilgilerini güncelleyebilirler.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Hata Yönetimi</h5>
+                <p class="card-text">
+                    API ve kullanıcı işlemleri sırasında oluşabilecek hatalar yönetilmektedir.
+                    Kullanıcı dostu hata mesajları ve uyarılar sağlanmaktadır.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-title {
+        font-size: 1.25rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .card-text {
+        margin-bottom: 1.25rem;
+    }
+</style>

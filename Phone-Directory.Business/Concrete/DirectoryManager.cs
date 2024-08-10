@@ -11,11 +11,11 @@ using System.Threading.Tasks;
 
 namespace Phone_Directory.Business.Concrete
 {
-    public class DirectoryService : IDirectoryService
+    public class DirectoryManager : IDirectoryService
     {
         private readonly IDirectoryRepository _directoryRepository;
         private readonly IMapper _mapper;
-        public DirectoryService(IDirectoryRepository directoryRepository, IMapper mapper)
+        public DirectoryManager(IDirectoryRepository directoryRepository, IMapper mapper)
         {
             _directoryRepository = directoryRepository;
             _mapper = mapper;
@@ -29,14 +29,13 @@ namespace Phone_Directory.Business.Concrete
 
         public async Task DeleteDirectoryAsync(int id)
         {
-            await _directoryRepository.DeleteDirectoryAsync ( id );
+            await _directoryRepository.DeleteDirectoryAsync(id);
         }
 
         public async Task<IEnumerable<DirectoryDto>> GetDirectoriesByUserIdAsync(int userId)
         {
             var directories = await _directoryRepository.GetDirectoriesByUserIdAsync(userId);
-            var directoryDtos = _mapper.Map<IEnumerable<DirectoryDto>>(directories);
-            return directoryDtos;
+            return _mapper.Map<IEnumerable<DirectoryDto>>(directories);
         }
 
         public async Task<DirectoryDto> GetDirectoryByIdAsync(int id)

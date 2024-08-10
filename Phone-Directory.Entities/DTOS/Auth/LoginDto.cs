@@ -5,15 +5,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Phone_Directory.Entities.DTOS.User
+namespace Phone_Directory.Entities.DTOS.Auth
 {
     public class LoginDto
     {
-        [Required(ErrorMessage = "Kullanıcı Adı Girilmesi Zorunludur")]
+        [Required(ErrorMessage = "Kullanıcı adı girilmesi zorunludur.")]
         public string Username { get; set; }
 
-        [Required(ErrorMessage = "Şifre Girilmesi Zorunludur")]
-        [MinLength(6, ErrorMessage = "Şifre en az 6 karakter olmalıdır")]
+        [Required(ErrorMessage = "Şifre girilmesi zorunludur.")]
+        [MinLength(6, ErrorMessage = "Şifre en az 6 karakter olmalıdır.")]
         public string Password { get; set; }
     }
 }

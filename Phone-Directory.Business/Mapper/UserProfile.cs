@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Phone_Directory.Entities.DTOS.Auth;
 using Phone_Directory.Entities.DTOS.User;
 using Phone_Directory.Entities.Models;
 using System;
@@ -13,14 +14,15 @@ namespace Phone_Directory.Business.Mapper
     {
         public UserProfile()
         {
-            CreateMap<UserDto, User>();
             CreateMap<UserDto, User>().ReverseMap();
 
-            CreateMap<RegisterDto, User>();
-            CreateMap<RegisterDto, User>().ReverseMap();
+            CreateMap<RegisterDto, User>()
+            .ForMember(dest => dest.PasswordHash, opt => opt.Ignore())
+            .ForMember(dest => dest.PasswordSalt, opt => opt.Ignore());
 
-            CreateMap<LoginDto, User>();
             CreateMap<LoginDto, User>().ReverseMap();
+
+            CreateMap<UpdateUserDto, User>().ReverseMap();
         }
     }
 }

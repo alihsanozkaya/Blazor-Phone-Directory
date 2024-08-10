@@ -35,5 +35,26 @@ namespace Phone_Directory.DataAccess.Concrete
                 user.Id = await connection.ExecuteScalarAsync<int>(query, user);
             }
         }
+
+        public async Task UpdateUserAsync(User user)
+        {
+            using (var connection = new NpgsqlConnection(_connectionString))
+            {
+                var query = "UPDATE Users SET Username = @username, " +
+                    "Firstname = @firstname, Lastname = @lastname " +
+                    "WHERE Id = @Id";
+                await connection.ExecuteAsync(query, user);
+            }
+        }
+
+        public async Task<User> GetUserAsync(int id)
+        {
+            using (var connection = new NpgsqlConnection(_connectionString))
+            {
+                var query = "SELECT * FROM Users WHERE Id = @Id";
+                var user = await connection.QuerySingleOrDefaultAsync<User>(query, new {Id = id});
+                return user;
+            }
+        }
     }
 }

@@ -1,0 +1,88 @@
+﻿@page "/directory/detail/{DirectoryId:int?}"
+@using Models.Directory
+@inject DirectoryService DirectoryService
+@inject AuthService AuthService
+@inject IJSRuntime JSRuntime
+@inject NavigationManager Navigation
+
+<PageTitle>Directory Detail</PageTitle>
+
+@if (directory == null)
+{
+    <p>Yükleniyor...</p>
+}
+else
+{
+    <div class="container mt-5">
+        <div class="form-container p-4 rounded shadow-sm" style="background-color: #DCD0FF">
+            <h2 class="text-center mb-4">Kişi Detayı</h2>
+
+            <div class="mb-2">
+                <h4 class="text-wrap"><strong>Ad:</strong> @directory.FirstName</h4>
+            </div>
+
+            <div class="mb-2">
+                <h4 class="text-wrap"><strong>Soyad:</strong> @directory.LastName</h4>
+            </div>
+
+            <div class="mb-2">
+                <h4 class="text-wrap"><strong>Numara:</strong> @directory.PhoneNumber</h4>
+            </div>
+
+            <div class="mb-3">
+                <h4 class="text-wrap"><strong>Adres:</strong> @directory.Address</h4>
+            </div>
+
+            <div class="d-flex justify-content-center mt-4">
+                <button class="btn text-white" style="background-color: #3A0647" @onclick="BackToDirectory">Geri Dön</button>
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+    .text-wrap {
+        word-wrap: break-word !important;
+        overflow-wrap: break-word !important;
+    }
+</style>
+
+@code {
+    [Parameter] public int? DirectoryId { get; set; }
+    private DirectoryModel? directory;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!await AuthService.IsAuthenticatedAsync())
+        {
+            Navigation.NavigateTo("/login", true);
+            return;
+        }
+
+        if (DirectoryId.HasValue)
+        {
+            await LoadDirectoryAsync(DirectoryId.Value);
+        }
+    }
+
+    private async Task LoadDirectoryAsync(int directoryId)
+    {
+        try
+        {
+            directory = await DirectoryService.GetDirectoryByIdAsync(directoryId);
+            if (directory == null)
+            {
+                Console.WriteLine("Kayıt bulunamadı.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Veri alınırken hata oluştu: {ex.Message}");
+        }
+    }
+
+    private void BackToDirectory()
+    {
+        Navigation.NavigateTo("/directory");
+    }
+}

@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace Phone_Directory.Entities.DTOS.Directory
+namespace Models.Directory
 {
-    public class DirectoryDto
+    public class DirectoryModel
     {
         public int Id { get; set; }
         public string FirstName { get; set; }
@@ -14,6 +10,5 @@ namespace Phone_Directory.Entities.DTOS.Directory
         public string PhoneNumber { get; set; }
         public string? Address { get; set; }
         public int UserId { get; set; }
-        public DateTime CreatedAt { get; set; }
     }
 }

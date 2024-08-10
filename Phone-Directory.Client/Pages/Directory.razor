@@ -1,0 +1,215 @@
+﻿@page "/directory"
+@inject DirectoryService DirectoryService
+@using Models.Directory
+@inject AuthService AuthService
+@inject IJSRuntime JSRuntime
+@inject NavigationManager Navigation
+
+<PageTitle>Directory</PageTitle>
+
+@if (directories == null)
+{
+    <p>Yükleniyor...</p>
+}
+else
+{
+    <div class="container">
+        <div class="form-container">
+            <h2 class="text-center">Kayıtlar</h2>
+            <p class="d-flex justify-content-end">Kayıt sayısı: @filteredDirectories.Length</p>
+
+            <div class="mb-3">
+                <InputText id="filterName" class="form-control" @bind-Value="filterName" @oninput="FilterDirectories" placeholder="Ara" />
+            </div>
+
+            <ul class="list-unstyled">
+                @foreach (var directory in filteredDirectories)
+                {
+                    <li class="directory-item mb-3">
+                        <div class="row">
+                            <div class="col-9" style="cursor: pointer" @onclick="() => NavigateToDetail(directory.Id)">
+                                <h5>@directory.FirstName @directory.LastName</h5>
+                            </div>
+                            <div class="col-3 d-flex justify-content-end">
+                                <div class="d-flex flex-row gap-2">
+                                    <button class="btn btn-warning btn-sm" @onclick="() => OpenUpdateModal(directory)">Güncelle</button>
+                                    <button class="btn btn-danger btn-sm" @onclick="() => ConfirmDelete(directory.Id)">Sil</button>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+
+    @if (isUpdateModalOpen)
+    {
+        <div class="modal d-block">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Kayıt Güncelle</h5>
+                        <button type="button" class="btn-close" @onclick="CloseUpdateModal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <EditForm Model="selectedDirectory" OnValidSubmit="HandleValidSubmit">
+                            <DataAnnotationsValidator />
+                            <div class="mb-3">
+                                <label for="firstName">Ad <strong class="text-danger">*</strong></label>
+                                <InputText class="form-control" id="firstName" @bind-Value="selectedDirectory.FirstName" />
+                                <ValidationMessage For="() => selectedDirectory.FirstName" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="lastName">Soyad</label>
+                                <InputText class="form-control" id="lastName" @bind-Value="selectedDirectory.LastName" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="phoneNumber">Telefon <strong class="text-danger">*</strong></label>
+                                <InputText class="form-control" id="phoneNumber" @bind-Value="selectedDirectory.PhoneNumber" />
+                                <ValidationMessage For="() => selectedDirectory.PhoneNumber" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="address">Adres</label>
+                                <InputTextArea class="form-control" id="address" @bind-Value="selectedDirectory.Address" />
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-success">Kaydet</button>
+                                <button type="button" class="btn btn-secondary" @onclick="CloseUpdateModal">İptal</button>
+                            </div>
+                        </EditForm>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-backdrop fade show"></div>
+    }
+}
+
+@code {
+    private DirectoryModel[]? directories;
+    private DirectoryModel[] filteredDirectories = Array.Empty<DirectoryModel>();
+    private DirectoryModel? selectedDirectory;
+    private bool isUpdateModalOpen = false;
+    private string filterName = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!await AuthService.IsAuthenticatedAsync())
+        {
+            Navigation.NavigateTo("/login", true);
+            return;
+        }
+
+        await LoadDirectoriesAsync();
+    }
+
+    private async Task LoadDirectoriesAsync()
+    {
+        try
+        {
+            var userId = await JSRuntime.InvokeAsync<string>("localStorage.getItem", "userId");
+            if (!string.IsNullOrEmpty(userId))
+            {
+                directories = await DirectoryService.GetDirectoriesByUserIdAsync(int.Parse(userId));
+                filteredDirectories = directories ?? Array.Empty<DirectoryModel>();
+            }
+            else
+            {
+                Console.WriteLine("UserId bulunamadı.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Veriler alınırken hata oluştu: {ex.Message}");
+        }
+    }
+
+    private void FilterDirectories(ChangeEventArgs e)
+    {
+        filterName = e.Value?.ToString() ?? string.Empty;
+
+        if (string.IsNullOrEmpty(filterName))
+        {
+            filteredDirectories = directories ?? Array.Empty<DirectoryModel>();
+        }
+        else
+        {
+            filteredDirectories = directories?
+                .Where(d => d != null &&
+                            (!string.IsNullOrEmpty(d.FirstName) && d.FirstName.Contains(filterName, StringComparison.OrdinalIgnoreCase) ||
+                             !string.IsNullOrEmpty(d.LastName) && d.LastName.Contains(filterName, StringComparison.OrdinalIgnoreCase)))
+                .ToArray() ?? Array.Empty<DirectoryModel>();
+        }
+        StateHasChanged();
+    }
+
+    private void OpenUpdateModal(DirectoryModel directory)
+    {
+        selectedDirectory = directory;
+        isUpdateModalOpen = true;
+    }
+
+    private void CloseUpdateModal()
+    {
+        isUpdateModalOpen = false;
+        selectedDirectory = null;
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            if (selectedDirectory != null)
+            {
+                await DirectoryService.UpdateDirectoryAsync(new UpdateDirectoryModel
+                    {
+                        Id = selectedDirectory.Id,
+                        FirstName = selectedDirectory.FirstName,
+                        LastName = selectedDirectory.LastName,
+                        PhoneNumber = selectedDirectory.PhoneNumber,
+                        Address = selectedDirectory.Address,
+                        UserId = selectedDirectory.UserId
+                    });
+
+                isUpdateModalOpen = false;
+                await LoadDirectoriesAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Güncelleme sırasında hata oluştu: {ex.Message}");
+        }
+    }
+
+    private async Task ConfirmDelete(int directoryId)
+    {
+        var confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Bu kaydı silmek istediğinize emin misiniz?");
+        if (confirmed)
+        {
+            await DeleteDirectory(directoryId);
+        }
+    }
+
+    private async Task DeleteDirectory(int directoryId)
+    {
+        try
+        {
+            await DirectoryService.DeleteDirectoryAsync(directoryId);
+            await LoadDirectoriesAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Silme sırasında hata oluştu: {ex.Message}");
+        }
+    }
+
+    private void NavigateToDetail(int directoryId)
+    {
+        Navigation.NavigateTo($"/directory/detail/{directoryId}");
+    }
+}
