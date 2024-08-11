@@ -1,8 +1,8 @@
 ﻿@page "/profile"
 @using Models.User
+@using Phone_Directory.Constants
 @using Services.User
 @inject NavigationManager Navigation
-@inject UpdateService UpdateService
 @inject AuthService AuthService
 @inject IJSRuntime JSRuntime
 @inject UserService UserService
@@ -130,12 +130,12 @@ else
             }
             else
             {
-                Console.WriteLine("Kullanıcı ID'si bulunamadı.");
+                Console.WriteLine(Messages.NotUserIDFound);
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Veri yüklenirken hata oluştu: {ex.Message}");
+            Console.WriteLine(Messages.ErrorOccurred, ex.Message);
         }
     }
 
@@ -163,7 +163,7 @@ else
         {
             if (selectedUser != null && !IsUserChanged(selectedUser, originalUser))
             {
-                errorMessage = "Güncellenmiş bir bilgi yok.";
+                errorMessage = Messages.NotUpdatedInfo;
                 return;
             }
 
@@ -187,7 +187,7 @@ else
         }
         catch (Exception ex)
         {
-            errorMessage = $"Güncelleme sırasında hata oluştu: {ex.Message}";
+            errorMessage = ex.Message;
         }
     }
 

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Phone_Directory.Business.Abstract;
+using Phone_Directory.Constants;
 using Phone_Directory.Entities.DTOS.Auth;
 using Phone_Directory.Entities.Models;
 
@@ -44,7 +45,7 @@ namespace Phone_Directory.Server.Controllers
             }
             var userDto = await _authService.Authenticate(loginDto);
             if (userDto == null)
-                return Unauthorized(new { message = "Geçersiz kullanıcı adı veya şifre" });
+                return Unauthorized(new { message = Messages.InvalidUsernameOrPassword });
 
             var token = _authService.GenerateJwtToken(new User
             {
@@ -52,7 +53,7 @@ namespace Phone_Directory.Server.Controllers
                 Username = userDto.Username
             });
 
-            return Ok(new { token, userId = userDto.Id, message = "Giriş yapıldı" });
+            return Ok(new { token, userId = userDto.Id, message = Messages.SuccessLogin });
         }
 
     }

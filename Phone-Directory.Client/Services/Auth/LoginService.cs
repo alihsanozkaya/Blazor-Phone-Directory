@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Models.Auth;
 using Models.Response;
+using Phone_Directory.Constants;
 
 public class LoginService
 {
@@ -26,12 +27,12 @@ public class LoginService
             }
             else
             {
-                return ("Giriş başarısız oldu.", null);
+                return (Messages.LoginFailed, null);
             }
         }
         catch (Exception ex)
         {
-            return ($"Bir hata oluştu: {ex.Message}", null);
+            return (ex.Message, null);
         }
     }
 }

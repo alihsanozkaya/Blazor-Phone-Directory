@@ -1,7 +1,7 @@
 ﻿using Microsoft.JSInterop;
-using Models.Directory;
 using Models.Response;
 using Models.User;
+using Phone_Directory.Constants;
 using System.Net.Http.Json;
 
 namespace Services.User
@@ -51,7 +51,7 @@ namespace Services.User
             }
             else
             {
-                return (null, false, apiResponse?.Message ?? "Güncelleme sırasında bir hata oluştu.");
+                return (null, false, apiResponse?.Message ?? Messages.UpdateFailed);
             }
         }
 

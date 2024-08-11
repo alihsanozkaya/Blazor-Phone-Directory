@@ -13,7 +13,7 @@
                 @errorMessage
             </div>
         }
-        <h2 class="text-center mt-2">Giriş yap</h2>
+        <h2 class="text-center mt-2">Giriş Yap</h2>
         <EditForm Model="loginModel" OnValidSubmit="HandleValidSubmit">
             <DataAnnotationsValidator />
 
@@ -65,7 +65,7 @@
         }
         catch (Exception ex)
         {
-            errorMessage = $"Giriş yapılırken bir hata oluştu: {ex.Message}";
+            errorMessage = ex.Message;
         }
     }
 }

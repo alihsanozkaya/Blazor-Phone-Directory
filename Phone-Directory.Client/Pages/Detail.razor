@@ -1,5 +1,6 @@
 ﻿@page "/directory/detail/{DirectoryId:int?}"
 @using Models.Directory
+@using Phone_Directory.Constants
 @inject DirectoryService DirectoryService
 @inject AuthService AuthService
 @inject IJSRuntime JSRuntime
@@ -72,12 +73,12 @@ else
             directory = await DirectoryService.GetDirectoryByIdAsync(directoryId);
             if (directory == null)
             {
-                Console.WriteLine("Kayıt bulunamadı.");
+                Console.WriteLine(Messages.NotRecordFound);
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Veri alınırken hata oluştu: {ex.Message}");
+            Console.WriteLine(Messages.ErrorOccurred, ex.Message);
         }
     }
 

@@ -1,5 +1,6 @@
 ﻿using Models.Auth;
 using Models.Response;
+using Phone_Directory.Constants;
 using System.Net.Http.Json;
 
 public class RegisterService
@@ -15,7 +16,7 @@ public class RegisterService
     {
         if (registerModel.Password != registerModel.ConfirmPassword)
         {
-            return "Şifreler eşleşmedi.";
+            return Messages.PasswordNotMatch;
         }
 
         try
@@ -29,12 +30,12 @@ public class RegisterService
             else
             {
                 var errorResponse = await response.Content.ReadFromJsonAsync<ErrorResponse>();
-                return errorResponse?.Message ?? "Kayıt başarısız oldu.";
+                return errorResponse?.Message ?? Messages.RegisterFailed;
             }
         }
         catch (Exception ex)
         {
-            return $"Bir hata oluştu: {ex.Message}";
+            return ex.Message;
         }
     }
 }

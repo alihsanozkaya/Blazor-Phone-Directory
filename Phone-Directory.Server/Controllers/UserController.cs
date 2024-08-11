@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Phone_Directory.Business.Abstract;
+using Phone_Directory.Constants;
 using Phone_Directory.Entities.DTOS.User;
 
 namespace Phone_Directory.Server.Controllers
@@ -23,9 +24,9 @@ namespace Phone_Directory.Server.Controllers
             var user = await _userService.GetUserAsync(id);
             if (user == null)
             {
-                return NotFound(new { Message = "Kullanıcı bulunamadı"});
+                return NotFound(new { Message = Messages.NotUserFound });
             }
-            return Ok(new {Data = user, Message = "Kullanıcı getirildi"});
+            return Ok(new { Data = user, Message = Messages.UserBrought });
         }
 
         [HttpPut("updateUser")]

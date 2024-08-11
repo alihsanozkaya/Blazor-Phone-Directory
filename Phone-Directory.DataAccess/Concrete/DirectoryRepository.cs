@@ -41,7 +41,7 @@ namespace Phone_Directory.DataAccess.Concrete
         {
             using (var connection = new NpgsqlConnection(_connectionString))
             {
-                string query = "SELECT * FROM Directory WHERE UserId = @UserId";
+                string query = "SELECT * FROM Directory WHERE UserId = @UserId ORDER BY LOWER(FirstName), LOWER(LastName)";
                 var directories = await connection.QueryAsync<Entities.Models.Directory>(query, new { UserId = userId });
                 return directories;
             }

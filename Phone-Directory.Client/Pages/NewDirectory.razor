@@ -1,5 +1,6 @@
 ﻿@page "/directory/newDirectory"
 @using Models.Directory
+@using Phone_Directory.Constants
 @inject DirectoryService DirectoryService
 @inject AuthService AuthService
 @inject IJSRuntime JSRuntime
@@ -7,7 +8,7 @@
 
 <div class="container">
     <div class="form-container">
-        <h2 class="text-center mt-2">Rehbere kayıt ekle</h2>
+        <h2 class="text-center mt-2">Rehbere Kayıt Ekle</h2>
         <EditForm Model="newDirectory" OnValidSubmit="HandleValidSubmit">
             <DataAnnotationsValidator />
 
@@ -59,7 +60,7 @@
         }
         else
         {
-            Console.WriteLine("UserId bulunamadı.");
+            Console.WriteLine(Messages.NotUserIdFound);
         }
     }
 
@@ -72,7 +73,7 @@
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Kayıt eklenirken hata oluştu: {ex.Message}");
+            Console.WriteLine(Messages.ErrorOccurred, ex.Message);
         }
     }
 

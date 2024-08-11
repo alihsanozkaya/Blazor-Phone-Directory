@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Phone_Directory.Business.Abstract;
+using Phone_Directory.Constants;
 using Phone_Directory.Entities.DTOS.Directory;
 
 namespace Phone_Directory.Server.Controllers
@@ -24,7 +25,7 @@ namespace Phone_Directory.Server.Controllers
             {
                 return NotFound();
             }
-            return Ok(new { Data = directories, Message = "Kullanıcıya özel kayıtlar geldi"});
+            return Ok(new { Data = directories, Message = Messages.UserSpecificRecords });
         }
 
         [HttpGet("getDirectoryById")]
@@ -33,17 +34,17 @@ namespace Phone_Directory.Server.Controllers
             var directory = await _directoryService.GetDirectoryByIdAsync(id);
             if (directory == null)
             {
-                return NotFound(new {Message = "Böyle bir kayıt mevcut değil"});
+                return NotFound(new { Message = Messages.NotRecordFound });
             }
-            return Ok(new { Data = directory, Message = "Kayıt getirildi" });
+            return Ok(new { Data = directory, Message = Messages.RecordBrought });
         }
-        
+
         [HttpPost("addDirectory")]
         public async Task<IActionResult> AddDirectory([FromBody] AddDirectoryDto addDirectoryDto)
         {
             var newDirectory = await _directoryService.AddDirectoryAsync(addDirectoryDto);
 
-            return Ok(new { Data = newDirectory, Message = "Rehbere kayıt eklendi" });
+            return Ok(new { Data = newDirectory, Message = Messages.RecordAddedDirectory });
         }
 
         [HttpPut("updateDirectory")]
@@ -51,7 +52,7 @@ namespace Phone_Directory.Server.Controllers
         {
             var updatedDirectory = await _directoryService.UpdateDirectoryAsync(updateDirectoryDto);
 
-            return Ok(new { Data = updatedDirectory, Message = "Rehberdeki kayıt güncellendi" });
+            return Ok(new { Data = updatedDirectory, Message = Messages.RecordUpdatedDirectory });
         }
 
         [HttpDelete("deleteDirectory")]
@@ -59,7 +60,7 @@ namespace Phone_Directory.Server.Controllers
         {
             await _directoryService.DeleteDirectoryAsync(id);
 
-            return Ok(new { Message = "Rehberdeki kayıt silindi" });
-        } 
+            return Ok(new { Message = Messages.RecordDeletedDirectory });
+        }
     }
 }

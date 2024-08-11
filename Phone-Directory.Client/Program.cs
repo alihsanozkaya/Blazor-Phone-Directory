@@ -13,6 +13,5 @@ builder.Services.AddScoped<RegisterService>();
 builder.Services.AddScoped<LoginService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<UserService>();
-builder.Services.AddScoped<UpdateService>();
 
 await builder.Build().RunAsync();

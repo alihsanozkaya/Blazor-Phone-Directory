@@ -1,4 +1,5 @@
-﻿@inherits LayoutComponentBase
+﻿@using Phone_Directory.Constants
+@inherits LayoutComponentBase
 @inject NavigationManager Navigation
 @inject IJSRuntime JSRuntime
 
@@ -16,7 +17,7 @@
             else
             {
                 <NavLink class="btn bg-white" style="text-decoration: none; background-color: #f0f4f6" href="login">Giriş yap</NavLink>
-                <NavLink class="btn bg-white" href="register" style="text-decoration: none; background-color: #f0f4f6">Kayıt ol</NavLink>
+                <NavLink class="btn bg-white" href="register" style="text-decoration: none; background-color: #f0f4f6">Üye ol</NavLink>
             }
         </div>
         <article class="content px-4">
@@ -46,7 +47,7 @@
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"JavaScript çağrısı sırasında hata oluştu: {ex.Message}");
+            Console.WriteLine(Messages.ErrorOccurred, ex.Message);
         }
     }
 

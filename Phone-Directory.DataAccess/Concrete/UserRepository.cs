@@ -52,7 +52,7 @@ namespace Phone_Directory.DataAccess.Concrete
             using (var connection = new NpgsqlConnection(_connectionString))
             {
                 var query = "SELECT * FROM Users WHERE Id = @Id";
-                var user = await connection.QuerySingleOrDefaultAsync<User>(query, new {Id = id});
+                var user = await connection.QuerySingleOrDefaultAsync<User>(query, new { Id = id });
                 return user;
             }
         }

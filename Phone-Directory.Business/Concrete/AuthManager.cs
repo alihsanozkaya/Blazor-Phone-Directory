@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Phone_Directory.Business.Abstract;
+using Phone_Directory.Constants;
 using Phone_Directory.DataAccess.Abstract;
 using Phone_Directory.Entities.DTOS.Auth;
 using Phone_Directory.Entities.DTOS.User;
@@ -35,7 +36,7 @@ namespace Phone_Directory.Business.Concrete
             var existingUser = await _userRepository.GetUserByUsernameAsync(registerDto.Username);
             if (existingUser != null)
             {
-                return (null, false, "Bu kullanıcı adı sitemde mevcut.");
+                return (null, false, Messages.UsernameExists);
             }
 
             CreatePasswordHash(registerDto.Password, out byte[] passwordHash, out byte[] passwordSalt);
@@ -47,7 +48,7 @@ namespace Phone_Directory.Business.Concrete
             await _userRepository.CreateUserAsync(user);
 
             var userDto = _mapper.Map<UserDto>(user);
-            return (userDto, true, "Kullanıcı başarıyla üye oldu.");
+            return (userDto, true, Messages.SuccessRegistered);
         }
 
         public async Task<UserDto> Authenticate(LoginDto loginDto)

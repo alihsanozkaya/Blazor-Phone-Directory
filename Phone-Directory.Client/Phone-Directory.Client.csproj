@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Phone-Directory.Constants\Phone-Directory.Constants.csproj" />
     <ProjectReference Include="..\Phone-Directory.Entities\Phone-Directory.Entities.csproj" />
 	  
   </ItemGroup>

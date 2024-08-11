@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Phone_Directory.Business.Abstract;
+using Phone_Directory.Constants;
 using Phone_Directory.DataAccess.Abstract;
 using Phone_Directory.Entities.DTOS.Auth;
 using Phone_Directory.Entities.DTOS.User;
@@ -34,14 +35,14 @@ namespace Phone_Directory.Business.Concrete
 
             if (existingUser != null && existingUser.Id != updateUserDto.Id)
             {
-                return (null, false, "Bu kullanıcı adı sitemde mevcut.");
+                return (null, false, Messages.UsernameExists);
             }
 
             var updatedUser = _mapper.Map<User>(updateUserDto);
             await _userRepository.UpdateUserAsync(updatedUser);
             var userDto = _mapper.Map<UserDto>(updatedUser);
 
-            return (userDto, true, "Kullanıcı başarıyla güncellendi.");
+            return (userDto, true, Messages.SuccessUpdatedUser);
         }
 
     }

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Phone_Directory.Constants;
+using System.ComponentModel.DataAnnotations;
 
 namespace Models.Auth
 {
@@ -18,7 +19,7 @@ namespace Models.Auth
         public string Password { get; set; }
         [Required(ErrorMessage = "Şifre tekrarının girilmesi zorunludur.")]
         [MinLength(6, ErrorMessage = "Şifre en az 6 karakter olmalıdır.")]
-        [Compare("Password", ErrorMessage = "Şifre ve Şifre Tekrarı için girilenler aynı olmalıdır.")]
+        [Compare("Password", ErrorMessage = "Şifre ve Şifre Tekrarı için girilen değer aynı olmalıdır.")]
         public string ConfirmPassword { get; set; }
     }
 }

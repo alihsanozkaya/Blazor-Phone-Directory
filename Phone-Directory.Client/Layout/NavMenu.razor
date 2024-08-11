@@ -1,4 +1,5 @@
-﻿@inject IJSRuntime JSRuntime
+﻿@using Phone_Directory.Constants
+@inject IJSRuntime JSRuntime
 
 <div class="top-row ps-5 navbar navbar-dark">
     <div class="container-fluid">
@@ -56,7 +57,7 @@
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"JavaScript çağrısı sırasında hata oluştu: {ex.Message}");
+            Console.WriteLine(Messages.ErrorOccurred, ex.Message);
         }
     }
     private bool collapseNavMenu = true;

@@ -5,8 +5,8 @@ namespace Models.Directory
     public class AddDirectoryModel
     {
         [Required(ErrorMessage = "Ad alanı gereklidir.")]
-        public string? FirstName { get; set; }
-        public string LastName { get; set; }
+        public string FirstName { get; set; }
+        public string? LastName { get; set; }
         [Required(ErrorMessage = "Telefon alanı gereklidir.")]
         [Phone(ErrorMessage = "Geçerli bir telefon numarası giriniz.")]
         public string PhoneNumber { get; set; }
